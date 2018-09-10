@@ -1,20 +1,21 @@
 require 'sinatra'
 # require 'aws-sdk'
 require 'mysql2'
-require 'pg'
 require 'bcrypt'
 load 'local_ENV2.rb' if File.exist?('local_ENV2.rb')
 enable :sessions
-# client = Postgresql::client.new(:username => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :host => ENV['RDS_HOSTNAME'], :port => ENV['RDS_PORT'], :database => ENV['RDS_DB_NAME'])
+# client = Mysql2::Client.new(:username => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :host => ENV['RDS_HOSTNAME'], :port => ENV['RDS_PORT'], :database => ENV['RDS_DB_NAME'], :socket => '/tmp/mysql.sock')
 
 db_params = {
   host: ENV['RDS_HOSTNAME'],
-  dbname: ENV['RDS_DB_NAME'],
-  user: ENV['RDS_USERNAME'],
+  database: ENV['RDS_DB_NAME'],
+  username: ENV['RDS_USERNAME'],
   port: ENV['RDS_PORT'],
   password: ENV['RDS_PASSWORD'],
+  socket: '/tmp/mysql.sock'
 }
 client = Mysql2::Client.new(db_params)
+
 
 get '/' do
 	erb :login_page, locals:{error: "", error2: ""}
@@ -33,7 +34,7 @@ post '/login_page' do
 	logininfo.each do |accounts|
 		salt = accounts[1][0].split('')
 		salt = salt[0..28].join
-		encrypt = BCrypt::Engine.hash_secret(password, salt)
+		encrypt = BCrypt::Engine.hash_secret(pword, salt)
 		if accounts[0][0] == loginname && accounts[1][0] == encrypt
 			redirect '/contacts_page'
 		end
@@ -50,29 +51,11 @@ post '/login_page_new' do
 	pword = client.escape(pword)
 	encryption = BCrypt::Password.create(pword)
 	loginname1 = loginname.split('')
-	counter = 0
-	loginname1.each do |elements|
-		if elements == " "
-			counter += 1
-		end
-	end
 	username_arr = []
 	results2.each do |row|
 		username_arr << row['username']
 	end
-	if counter >= 2
-		erb :login_page, locals:{error: "", error2: "Invalid Username Format"}
-	elsif username_arr.include?(loginname)
-		erb :login_page, locals:{error: "", error2: "Username Already Exists"}
-	elsif password != confirmpass
-		erb :login_page, locals:{error: "", error2: "Check Passwords"}
-	else
-		loginname = client.escape(loginname)
-		client.query("INSERT INTO login(username, pword)
-  		VALUES('#{loginname}', '#{encryption}')")
-   		redirect '/contacts_page'
-   	end
-end
+	end
 
 get '/contacts_page' do
 	loginname = session[:loginname]
@@ -132,36 +115,7 @@ post '/contacts_page_update' do
 	notes_arr = params[:notes_arr]
 	loginname = session[:loginname]
 	loginname = client.escape(loginname)
-	counter = 0
-	unless id_arr == nil
-		  id_arr.each do |ind|
-			     ind = client.escape(ind)
-			     id_arr[counter] = client.escape(id_arr[counter])
-           client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
-           lastname_arr[counter] = client.escape(lastname_arr[counter])
-           client.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
-			     phone_arr[counter] = client.escape(phone_arr[counter])
-           client.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
-
-           address1_arr[counter] = client.escape(address1_arr[counter])
-           client.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
-           address2_arr[counter] = client.escape(address2_arr[counter])
-           client.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
-
-           city_arr[counter] = client.escape(address_arr[counter])
-           client.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
-           state_arr[counter] = client.escape(address_arr[counter])
-           client.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
-           zip_arr[counter] = client.escape(address_arr[counter])
-           client.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
-
-
-           notes_arr[counter] = client.escape(notes_arr[counter])
-           client.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
-			     counter += 1
-		end
-	end
-	results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
+		results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 	info = []
   	results.each do |row|
     	info << [[row['Index']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
@@ -182,36 +136,7 @@ post '/contacts_page_delete' do
 	notes_arr = params[:notes_arr]
 	loginname = session[:loginname]
 	loginname = client.escape(loginname)
-	counter = 0
-	unless index_arr == nil
-		index_arr.each do |ind|
-			ind = client.escape(ind)
 
-      client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
-      lastname_arr[counter] = client.escape(lastname_arr[counter])
-      client.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
-      phone_arr[counter] = client.escape(phone_arr[counter])
-      client.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
-
-      address1_arr[counter] = client.escape(address1_arr[counter])
-      client.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
-      address2_arr[counter] = client.escape(address2_arr[counter])
-      client.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
-
-      city_arr[counter] = client.escape(address_arr[counter])
-      client.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
-      state_arr[counter] = client.escape(address_arr[counter])
-      client.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
-      zip_arr[counter] = client.escape(address_arr[counter])
-      client.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
-
-
-      notes_arr[counter] = client.escape(notes_arr[counter])
-      client.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
-
-			counter += 1
-		end
-	end
 	# number = client.escape(number)
 	# client.query("DELETE FROM 'entry' WHERE `Number`='#{number}' AND `Owner`='#{loginname}'")
 	# results = client.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
