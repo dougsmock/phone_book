@@ -2,7 +2,7 @@ require 'sinatra'
 # require 'aws-sdk'
 require 'pg'
 require 'bcrypt'
-load 'local_ENV2.rb' if File.exist?('local_ENV2.rb')
+load './local_ENV.rb' if File.exists?('./local_ENV.rb')
 enable :sessions
 
 db_params = {
@@ -13,7 +13,7 @@ db_params = {
   password: ENV['RDS_PASSWORD']
 }
 
-client = PG::Client.new(db_params)
+client = PG::Connection.new(db_params)
 
 get '/' do
 	erb :login_page, locals:{error: "", error2: ""}
@@ -25,8 +25,8 @@ post '/login_page' do
   personid = params[:personid]
   # session[:loginname] = loginname
   logininfo = []
-  client.query("INSERT INTO login(personid, username, password)) VALUES(UUID(), '#{username}', '#{password}')
-  results2 = client.query("SELECT 'personid' FROM 'user' WHERE username = '#{username}' AND password = '#{password}')
+  client.query("INSERT INTO login VALUES (UUID(), username, password)")
+  results2 = client.query("SELECT personid FROM login WHERE username = '#{username}' AND password = '#{password}'")
   results2.each do |row|
     logininfo << [[row['personid']], [row['Username']], [row['Password']]]
   end
@@ -39,6 +39,7 @@ post '/login_page' do
 			redirect '/contacts_page'
 		end
 		erb :login_page, locals:{logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
+  end
 end
 
 
@@ -212,13 +213,15 @@ post '/contacts_page_delete' do
 
 			counter += 1
 		end
-	end
+  end
+end
+
 	# number = client.escape(number)
-	# client.query("DELETE FROM 'entry' WHERE `Number`='#{number}' AND `Owner`='#{loginname}'")
+	# client.query("DELETE FROM 'entry' WHERE 'Number'='#{number}' AND `Owner`='#{loginname}'")
 	# results = client.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
 	# info = []
   # 	results.each do |row|
   #   	info << [[row['Index']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
  	# end
-	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
-end
+	# erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
+# end
