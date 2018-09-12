@@ -1,5 +1,5 @@
 require 'sinatra'
-# require 'aws-sdk'
+require 'aws-sdk'
 require 'mysql2'
 require 'bcrypt'
 load 'local_ENV2.rb' if File.exist?('local_ENV2.rb')

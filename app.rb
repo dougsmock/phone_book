@@ -1,35 +1,36 @@
 require 'sinatra'
 # require 'aws-sdk'
-require 'mysql2'
 require 'pg'
 require 'bcrypt'
 load 'local_ENV2.rb' if File.exist?('local_ENV2.rb')
 enable :sessions
-# client = Postgresql::client.new(:username => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :host => ENV['RDS_HOSTNAME'], :port => ENV['RDS_PORT'], :database => ENV['RDS_DB_NAME'])
 
 db_params = {
   host: ENV['RDS_HOSTNAME'],
   dbname: ENV['RDS_DB_NAME'],
   user: ENV['RDS_USERNAME'],
   port: ENV['RDS_PORT'],
-  password: ENV['RDS_PASSWORD'],
+  password: ENV['RDS_PASSWORD']
 }
-client = Mysql2::Client.new(db_params)
+
+client = PG::Client.new(db_params)
 
 get '/' do
 	erb :login_page, locals:{error: "", error2: ""}
 end
 
 post '/login_page' do
-	loginname = params[:loginname]
-	loginname = client.escape(loginname)
-	results2 = client.query("SELECT * FROM login WHERE 'Username' = '#{loginname}'")
-	pword = params[:pword]
-	session[:loginname] = loginname
-	logininfo = []
-	results2.each do |row|
-		logininfo << [[row['Username']], [row['Pword']]]
-	end
+  username = params[:username]
+  password = params[:password]
+  personid = params[:personid]
+  # session[:loginname] = loginname
+  logininfo = []
+  client.query("INSERT INTO login(personid, username, password)) VALUES(UUID(), '#{username}', '#{password}')
+  results2 = client.query("SELECT 'personid' FROM 'user' WHERE username = '#{username}' AND password = '#{password}')
+  results2.each do |row|
+    logininfo << [[row['personid']], [row['Username']], [row['Password']]]
+  end
+
 	logininfo.each do |accounts|
 		salt = accounts[1][0].split('')
 		salt = salt[0..28].join
@@ -37,18 +38,18 @@ post '/login_page' do
 		if accounts[0][0] == loginname && accounts[1][0] == encrypt
 			redirect '/contacts_page'
 		end
-	end
-	erb :login_page, locals:{logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
+		erb :login_page, locals:{logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
 end
+
 
 post '/login_page_new' do
 	results2 = client.query("SELECT * FROM login")
 	loginname = params[:loginname]
-	pword = params[:pword]
+	password = params[:password]
 	confirmpass = params[:confirmpass]
 	session[:loginname] = loginname
-	pword = client.escape(pword)
-	encryption = BCrypt::Password.create(pword)
+	password = client.escape(password)
+	encryption = BCrypt::Password.create(password)
 	loginname1 = loginname.split('')
 	counter = 0
 	loginname1.each do |elements|
@@ -68,7 +69,7 @@ post '/login_page_new' do
 		erb :login_page, locals:{error: "", error2: "Check Passwords"}
 	else
 		loginname = client.escape(loginname)
-		client.query("INSERT INTO login(username, pword)
+		client.query("INSERT INTO login(username, password)
   		VALUES('#{loginname}', '#{encryption}')")
    		redirect '/contacts_page'
    	end
@@ -79,10 +80,10 @@ get '/contacts_page' do
 	loginname = client.escape(loginname)
 	results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 	info = []
-  	results.each do |row|c
-    	info << [[row['ID']], [row['Name']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
+  	results.each do |row|
+    	info << [[row['ID']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
  	end
-	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
+	erb :login_page, locals:{info: info, loginname: session[:loginname]}
 end
 
 post '/contacts_page_add' do
