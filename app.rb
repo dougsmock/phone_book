@@ -6,7 +6,7 @@ load './local_ENV.rb' if File.exists?('./local_ENV.rb')
 enable :sessions
 
 db_params = {
-  host: ENV['RDS_HOSTNAME'],
+  host: ENV['RDS_HOST'],
   dbname: ENV['RDS_DB_NAME'],
   user: ENV['RDS_USERNAME'],
   port: ENV['RDS_PORT'],
@@ -16,29 +16,30 @@ db_params = {
 client = PG::Connection.new(db_params)
 
 get '/' do
-	erb :login_page, locals:{error: "", error2: ""}
+	erb :login_page
+  # , locals:{error: "", error2: ""}
 end
 
 post '/login_page' do
-  username = params[:username]
-  password = params[:password]
-  personid = params[:personid]
-  # session[:loginname] = loginname
+  # pk = params[:pk]
+  user = params[:user]
+  pword = params[:pword]
+  session[:loginname] = loginname #was grayed out?
   logininfo = []
-  client.query("INSERT INTO login VALUES (UUID(), username, password)")
-  results2 = client.query("SELECT personid FROM login WHERE username = '#{username}' AND password = '#{password}'")
+  client.query("INSERT INTO login VALUES (user, pword)")
+  results2 = client.query("SELECT pk FROM login WHERE user = '#{user}' AND pword = '#{pword}'")
   results2.each do |row|
-    logininfo << [[row['personid']], [row['Username']], [row['Password']]]
+    logininfo << [[row['pk']], [row['user']], [row['pword']]]
   end
 
 	logininfo.each do |accounts|
 		salt = accounts[1][0].split('')
 		salt = salt[0..28].join
-		encrypt = BCrypt::Engine.hash_secret(password, salt)
-		if accounts[0][0] == loginname && accounts[1][0] == encrypt
+		encrypt = BCrypt::Engine.hash_secret(pword, salt)
+		if (accounts[0][0] == loginname) && (accounts[1][0] == encrypt) #?????
 			redirect '/contacts_page'
-		end
-		erb :login_page, locals:{logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
+      erb :login_page, locals:{logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
+    end
   end
 end
 
@@ -46,11 +47,11 @@ end
 post '/login_page_new' do
 	results2 = client.query("SELECT * FROM login")
 	loginname = params[:loginname]
-	password = params[:password]
+	pword = params[:pword]
 	confirmpass = params[:confirmpass]
 	session[:loginname] = loginname
-	password = client.escape(password)
-	encryption = BCrypt::Password.create(password)
+	pword = client.escape(pword)
+	encryption = BCrypt::Password.create(pword)
 	loginname1 = loginname.split('')
 	counter = 0
 	loginname1.each do |elements|
@@ -66,11 +67,11 @@ post '/login_page_new' do
 		erb :login_page, locals:{error: "", error2: "Invalid Username Format"}
 	elsif username_arr.include?(loginname)
 		erb :login_page, locals:{error: "", error2: "Username Already Exists"}
-	elsif password != confirmpass
+	elsif pword != confirmpass
 		erb :login_page, locals:{error: "", error2: "Check Passwords"}
 	else
 		loginname = client.escape(loginname)
-		client.query("INSERT INTO login(username, password)
+		client.query("INSERT INTO login(username, pword)
   		VALUES('#{loginname}', '#{encryption}')")
    		redirect '/contacts_page'
    	end
