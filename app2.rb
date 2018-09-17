@@ -1,24 +1,25 @@
+#alternate app.rb
+
 require 'sinatra'
-require 'aws-sdk'
-require 'mysql2'
+# require 'aws-sdk'
+require 'pg'
 require 'bcrypt'
-load 'local_ENV2.rb' if File.exist?('local_ENV2.rb')
+load './local_ENV.rb' if File.exists?('./local_ENV.rb')
 enable :sessions
-# client = Mysql2::Client.new(:username => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :host => ENV['RDS_HOSTNAME'], :port => ENV['RDS_PORT'], :database => ENV['RDS_DB_NAME'], :socket => '/tmp/mysql.sock')
 
 db_params = {
-  host: ENV['RDS_HOSTNAME'],
-  database: ENV['RDS_DB_NAME'],
-  username: ENV['RDS_USERNAME'],
+  host: ENV['RDS_HOST'],
+  dbname: ENV['RDS_DB_NAME'],
+  user: ENV['RDS_USERNAME'],
   port: ENV['RDS_PORT'],
-  password: ENV['RDS_PASSWORD'],
-  socket: '/tmp/mysql.sock'
+  password: ENV['RDS_PASSWORD']
 }
-client = Mysql2::Client.new(db_params)
 
+client = PG::Connection.new(db_params)
 
 get '/' do
-	erb :login_page, locals:{error: "", error2: ""}
+	erb :login_page
+  # , locals:{error: "", error2: ""}
 end
 
 post '/login_page' do
