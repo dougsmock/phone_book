@@ -2,51 +2,40 @@ require 'sinatra'
 # require 'aws-sdk'
 require 'pg'
 require 'bcrypt'
+require 'securerandom'
 load './local_ENV.rb' if File.exists?('./local_ENV.rb')
 enable :sessions
 
-db_params = {
-  host: ENV['RDS_HOST'],
-  dbname: ENV['RDS_DB_NAME'],
-  user: ENV['RDS_USERNAME'],
-  port: ENV['RDS_PORT'],
-  password: ENV['RDS_PASSWORD']
-}
+
 
 #############################
 
-client = PG::Connection.open(db_params)
-
+client = PG::Connection.open(:host => ENV['RDS_HOST'], :dbname => ENV['RDS_DB_NAME'], :user => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :port => ENV['RDS_PORT'])
 
 def prepare_statements(client)
-	client.prepare("newuser4", "insert into login (uuid, user, pword) values ($1, $2, $3)")
-	client.prepare("cons", "insert into numbers (lastname, firstname, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7)")
+	client.prepare("newuser4", "insert into login (uuid, userid, pword) values($1, $2, $3)")
+	client.prepare("cons", "insert into numbers (lastname, firstname, phone, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7, $8)")
 end
 prepare_statements(client)
 
 
 ###############################
 
-
-
-
-
-
 get '/' do
 	erb :login_page, locals:{error: "", error2: ""}
 end
 
 post '/login_page' do
-  pk = params[:pk]
-  user = params[:user]
+  uuid = params[:uuid]
   pword = params[:pword]
+  userid = params[:userid]
   loginname = params[:loginname]
   session[:loginname] = loginname
   logininfo = []
-  client.query("INSERT INTO login VALUES (user, pword)")
-  results2 = client.query("SELECT pk FROM login WHERE user = '#{user}' AND pword = '#{pword}'")
+  client.exec_prepared('newuser4', [SecureRandom.uuid, params[:userid], params[:pword]])
+  results2 = client.query("SELECT uuid FROM login WHERE userid = '#{userid}' AND pword = '#{pword}'")
   results2.each do |row|
-    logininfo << [[row['pk']], [row['user']], [row['pword']]]
+    logininfo << [[row['uuid']], [row['userid']], [row['pword']]]
   end
 
 	logininfo.each do |accounts|
@@ -59,6 +48,7 @@ post '/login_page' do
   end
   erb :phone_form, locals:{loginname: loginname, logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
 end
+
 
 get '/login_page' do
   erb :register, locals:{loginname: loginname, logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
@@ -92,20 +82,20 @@ post '/register' do
 			counter += 1
 		end
 	end
-	user_arr = []
+	userid_arr = []
 	results2.each do |row|
-		user_arr << row['user']
+		userid_arr << row['userid']
 	end
 	# if counter >= 2
 	# 	erb :login_page, locals:{error: "", error2: "Invalid Username Format"}
-	# elsif user_arr.include?(loginname)
+	# elsif userid_arr.include?(loginname)
 	# 	erb :login_page, locals:{error: "", error2: "Username Already Exists"}
 	# elsif pword != confirmpass
 	# 	erb :login_page, locals:{error: "", error2: "Check Passwords"}
 	# else
 		loginname = client.escape(loginname)
-		client.query("INSERT INTO login (pk, user, pword)
-    VALUES('#{loginname}', '#{encryption}')");
+		client.query("INSERT INTO login (uuid, userid, pword)
+    VALUES ($1, $2, $3)");
    		redirect '/phone_form' #for updating stuff.
    	# end
 end
@@ -168,7 +158,7 @@ end
 
 #
 # post '/contacts_page_update' do
-# 	pk_arr = params[:pk_arr]
+# 	uuid_arr = params[:uuid_arr]
 # 	firstname_arr = params[:firstname_arr]
 #   lastname_arr = params[:lastname_arr]
 # 	phone_arr = params[:phone_arr]
@@ -212,7 +202,7 @@ end
 # 	results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
-#     	info << [[row['pk']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
+#     	info << [[row['uuid']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
 #  	end
 # 	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
 # end
@@ -231,8 +221,8 @@ end
 # 	loginname = session[:loginname]
 # 	loginname = client.escape(loginname)
 # 	counter = 0
-# 	unless pk_arr == nil
-# 		pk_arr.each do |ind|
+# 	unless uuid_arr == nil
+# 		uuid_arr.each do |ind|
 # 			ind = client.escape(ind)
 #
 #       client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
@@ -267,7 +257,7 @@ end
 # 	results = client.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
-#     	info << [[row['pk']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
+#     	info << [[row['uuid']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
 #  	end
 # 	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
 # end
