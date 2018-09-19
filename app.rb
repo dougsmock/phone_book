@@ -13,7 +13,24 @@ db_params = {
   password: ENV['RDS_PASSWORD']
 }
 
-client = PG::Connection.new(db_params)
+#############################
+
+client = PG::Connection.open(db_params)
+
+
+def prepare_statements(client)
+	client.prepare("newuser4", "insert into login (uuid, user, pword) values ($1, $2, $3)")
+	client.prepare("cons", "insert into numbers (lastname, firstname, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7)")
+end
+prepare_statements(client)
+
+
+###############################
+
+
+
+
+
 
 get '/' do
 	erb :login_page, locals:{error: "", error2: ""}
@@ -87,8 +104,8 @@ post '/register' do
 	# 	erb :login_page, locals:{error: "", error2: "Check Passwords"}
 	# else
 		loginname = client.escape(loginname)
-		client.query("INSERT INTO login (user, pword)
-  		VALUES('#{loginname}', '#{encryption}')")
+		client.query("INSERT INTO login (pk, user, pword)
+    VALUES('#{loginname}', '#{encryption}')");
    		redirect '/phone_form' #for updating stuff.
    	# end
 end
