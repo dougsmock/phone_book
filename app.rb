@@ -10,13 +10,13 @@ enable :sessions
 
 #############################
 
-client = PG::Connection.open(:host => ENV['RDS_HOST'], :dbname => ENV['RDS_DB_NAME'], :user => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :port => ENV['RDS_PORT'])
+conn = PG::Connection.open(:host => ENV['RDS_HOST'], :dbname => ENV['RDS_DB_NAME'], :user => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :port => ENV['RDS_PORT'])
 
-def prepare_statements(client)
-	client.prepare("newuser4", "insert into login (uuid, userid, pword) values($1, $2, $3)")
-	client.prepare("cons", "insert into numbers (lastname, firstname, phone, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7, $8)")
+def prepare_statements(conn)
+	conn.prepare("newuser4", "insert into login (uuid, userid, pword) values ($1, $2, $3)")
+	conn.prepare("cons", "insert into numbers (lastname, firstname, phone, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7, $8)")
 end
-prepare_statements(client)
+prepare_statements(conn)
 
 
 ###############################
@@ -32,8 +32,8 @@ post '/login_page' do
   loginname = params[:loginname]
   session[:loginname] = loginname
   logininfo = []
-  client.exec_prepared('newuser4', [SecureRandom.uuid, params[:userid], params[:pword]])
-  results2 = client.query("SELECT uuid FROM login WHERE userid = '#{userid}' AND pword = '#{pword}'")
+  conn.exec_prepared('newuser4', [uuid, params[:userid], params[:pword]])
+  results2 = conn.query("SELECT uuid FROM login WHERE userid = '#{userid}' AND pword = '#{pword}'")
   results2.each do |row|
     logininfo << [[row['uuid']], [row['userid']], [row['pword']]]
   end
@@ -60,15 +60,16 @@ post '/register1' do
 end
 
 post '/register' do
-  # p "Goodbye, world!"
-	results2 = client.query("SELECT * FROM login")
+  uuid = 0
+  p "Look here #{params}"
+	results2 = conn.query("SELECT * FROM login")
 	loginname = params[:loginname]
-  pword = params[:pword]
+  pword = params[:password]
 	confirmpass = params[:confirmpass]
 	# session[:loginname] = loginname
   #
   # unless pword == nil
-  #   pword = client.escape(pword)
+  #   pword = conn.escape(pword)
   # end
 
   encryption = BCrypt::Password.create(pword)
@@ -93,9 +94,9 @@ post '/register' do
 	# elsif pword != confirmpass
 	# 	erb :login_page, locals:{error: "", error2: "Check Passwords"}
 	# else
-		loginname = client.escape(loginname)
-		client.query("INSERT INTO login (uuid, userid, pword)
-    VALUES ($1, $2, $3)");
+  p "#{pword}"
+		loginname = conn.escape(loginname)
+		conn.query("INSERT INTO login(uuid, userid, pword) VALUES('#{uuid}, #{loginname}, #{pword}')");
    		redirect '/phone_form' #for updating stuff.
    	# end
 end
@@ -111,20 +112,20 @@ post '/phone_form' do
   zip = params[:zip]
 	loginname = session[:loginname]
   unless lastname == nil
-    lastname = client.escape(lastname)
-    firstname = client.escape(firstname)
-    phone = client.escape(phone)
-    address1 = client.escape(address1)
-    address2 = client.escape(address2)
-    city = client.escape(city)
-    state = client.escape(state)
-    zip = client.escape(zip)
-	  loginname = client.escape(loginname)
+    lastname = conn.escape(lastname)
+    firstname = conn.escape(firstname)
+    phone = conn.escape(phone)
+    address1 = conn.escape(address1)
+    address2 = conn.escape(address2)
+    city = conn.escape(city)
+    state = conn.escape(state)
+    zip = conn.escape(zip)
+	  loginname = conn.escape(loginname)
   end
 
-	client.query("INSERT INTO numbers (lastname, firstname, phone, address1, address2, city, state, zip)
+	conn.query("INSERT INTO numbers (lastname, firstname, phone, address1, address2, city, state, zip)
   	VALUES('#{lastname}', '#{firstname}', '#{phone}', '#{address1}', '#{address2}', '#{city}', '#{state}', '#{zip}')")
-  	results = client.query("SELECT * FROM numbers WHERE 'lastname'='#{lastname}'")
+  	results = conn.query("SELECT * FROM numbers WHERE 'lastname'='#{lastname}'")
 	info = []
   	results.each do |row|
     	info << [[row['lastname']], [row['firstname']], [row['phone']], [row['address1']], [row['address2']], [row['city']], [row['state']], [row['zip']]]
@@ -143,8 +144,8 @@ end
 # p "Go take a hike!"
 # get '/contacts_page' do
 #   loginname = session[:loginname]
-#   loginname = client.escape(loginname)
-#   results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
+#   loginname = conn.escape(loginname)
+#   results = conn.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 #   info = []
 #     results.each do |row|
 #       info << [[row['ID']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
@@ -169,37 +170,37 @@ end
 #   zip_arr = params[:zip_arr]
 # 	notes_arr = params[:notes_arr]
 # 	loginname = session[:loginname]
-# 	loginname = client.escape(loginname)
+# 	loginname = conn.escape(loginname)
 # 	counter = 0
 # 	unless id_arr == nil
 # 		  id_arr.each do |ind|
-# 			     ind = client.escape(ind)
-# 			     id_arr[counter] = client.escape(id_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
-#            lastname_arr[counter] = client.escape(lastname_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
-# 			     phone_arr[counter] = client.escape(phone_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
+# 			     ind = conn.escape(ind)
+# 			     id_arr[counter] = conn.escape(id_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
+#            lastname_arr[counter] = conn.escape(lastname_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
+# 			     phone_arr[counter] = conn.escape(phone_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
 #
-#            address1_arr[counter] = client.escape(address1_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
-#            address2_arr[counter] = client.escape(address2_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
+#            address1_arr[counter] = conn.escape(address1_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
+#            address2_arr[counter] = conn.escape(address2_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
 #
-#            city_arr[counter] = client.escape(address_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
-#            state_arr[counter] = client.escape(address_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
-#            zip_arr[counter] = client.escape(address_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#            city_arr[counter] = conn.escape(address_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#            state_arr[counter] = conn.escape(address_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#            zip_arr[counter] = conn.escape(address_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
 #
 #
-#            notes_arr[counter] = client.escape(notes_arr[counter])
-#            client.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
+#            notes_arr[counter] = conn.escape(notes_arr[counter])
+#            conn.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
 # 			     counter += 1
 # 		end
 # 	end
-# 	results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
+# 	results = conn.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
 #     	info << [[row['uuid']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
@@ -219,42 +220,42 @@ end
 #   zip_arr = params[:zip_arr]
 # 	notes_arr = params[:notes_arr]
 # 	loginname = session[:loginname]
-# 	loginname = client.escape(loginname)
+# 	loginname = conn.escape(loginname)
 # 	counter = 0
 # 	unless uuid_arr == nil
 # 		uuid_arr.each do |ind|
-# 			ind = client.escape(ind)
+# 			ind = conn.escape(ind)
 #
-#       client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
-#       lastname_arr[counter] = client.escape(lastname_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
-#       phone_arr[counter] = client.escape(phone_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
+#       conn.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
+#       lastname_arr[counter] = conn.escape(lastname_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Firstname'='#{name_arr[counter]}' WHERE 'ID'='#{ind}'")
+#       phone_arr[counter] = conn.escape(phone_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Phone'='#{phone_arr[counter]}' WHERE 'ID'='#{ind}'")
 #
-#       address1_arr[counter] = client.escape(address1_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
-#       address2_arr[counter] = client.escape(address2_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
+#       address1_arr[counter] = conn.escape(address1_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Address'='#{address1_arr[counter]}' WHERE 'ID'='#{ind}'")
+#       address2_arr[counter] = conn.escape(address2_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Address'='#{address2_arr[counter]}' WHERE 'ID'='#{ind}'")
 #
-#       city_arr[counter] = client.escape(address_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
-#       state_arr[counter] = client.escape(address_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
-#       zip_arr[counter] = client.escape(address_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#       city_arr[counter] = conn.escape(address_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Address'='#{city_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#       state_arr[counter] = conn.escape(address_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Address'='#{state_arr1[counter]}' WHERE 'ID'='#{ind}'")
+#       zip_arr[counter] = conn.escape(address_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Address'='#{zip_arr1[counter]}' WHERE 'ID'='#{ind}'")
 #
 #
-#       notes_arr[counter] = client.escape(notes_arr[counter])
-#       client.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
+#       notes_arr[counter] = conn.escape(notes_arr[counter])
+#       conn.query("UPDATE 'entry' SET 'Notes'='#{notes_arr[counter]}' WHERE 'ID'='#{ind}'")
 #
 # 			counter += 1
 # 		end
 #   end
 # end
 #
-# 	number = client.escape(number)
-# 	client.query("DELETE FROM 'entry' WHERE 'Number'='#{number}' AND `Owner`='#{loginname}'")
-# 	results = client.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
+# 	number = conn.escape(number)
+# 	conn.query("DELETE FROM 'entry' WHERE 'Number'='#{number}' AND `Owner`='#{loginname}'")
+# 	results = conn.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
 #     	info << [[row['uuid']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
