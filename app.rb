@@ -37,10 +37,10 @@ post '/login_page' do
 		salt = salt[0..28].join
 		encrypt = BCrypt::Engine.hash_secret(pword, salt)
 		if (accounts[0][0] == loginname) && (accounts[1][0] == encrypt)
-			redirect '/contacts_page'
-      erb :phone_form, locals:{loginname: loginname, logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
+			redirect '/phone_form'
     end
   end
+  erb :phone_form, locals:{loginname: loginname, logininfo: logininfo, error: "Incorrect Username/Password", error2: ""}
 end
 
 get '/login_page' do
@@ -56,46 +56,45 @@ post '/register' do
   # p "Goodbye, world!"
 	results2 = client.query("SELECT * FROM login")
 	loginname = params[:loginname]
-	pword = params[:pword]
+  pword = params[:pword]
 	confirmpass = params[:confirmpass]
-	session[:loginname] = loginname
+	# session[:loginname] = loginname
   #
   # unless pword == nil
   #   pword = client.escape(pword)
   # end
 
   encryption = BCrypt::Password.create(pword)
-
   unless loginname == nil
     loginname1 = loginname.split('')
   end
-
   counter = 0
+  p "Reaching login #{loginname1}"
 	loginname1.each do |elements|
 		if elements == " "
 			counter += 1
 		end
 	end
-	username_arr = []
+	user_arr = []
 	results2.each do |row|
-		username_arr << row['username']
+		user_arr << row['user']
 	end
-	if counter >= 2
-		erb :login_page, locals:{error: "", error2: "Invalid Username Format"}
-	elsif username_arr.include?(loginname)
-		erb :login_page, locals:{error: "", error2: "Username Already Exists"}
-	elsif pword != confirmpass
-		erb :login_page, locals:{error: "", error2: "Check Passwords"}
-	else
+	# if counter >= 2
+	# 	erb :login_page, locals:{error: "", error2: "Invalid Username Format"}
+	# elsif user_arr.include?(loginname)
+	# 	erb :login_page, locals:{error: "", error2: "Username Already Exists"}
+	# elsif pword != confirmpass
+	# 	erb :login_page, locals:{error: "", error2: "Check Passwords"}
+	# else
 		loginname = client.escape(loginname)
-		client.query("INSERT INTO login(username, pword)
+		client.query("INSERT INTO login (user, pword)
   		VALUES('#{loginname}', '#{encryption}')")
-   		redirect '/contacts_page' #for updating stuff.
-   	end
+   		redirect '/phone_form' #for updating stuff.
+   	# end
 end
 
 post '/phone_form' do
-	lastname = params[:lastname]
+  lastname = params[:lastname]
   firstname = params[:firstname]
 	phone = params[:phone]
 	address1 = params[:address1]
@@ -103,27 +102,27 @@ post '/phone_form' do
   city = params[:city]
   state = params[:state]
   zip = params[:zip]
-	notes = params[:notes]
 	loginname = session[:loginname]
-  lastname = client.escape(lastname)
-  firstname = client.escape(firstname)
-  phone = client.escape(phone)
-  address1 = client.escape(address1)
-  address2 = client.escape(address2)
-  city = client.escape(city)
-  state = client.escape(state)
-  zip = client.escape(zip)
-  notes = client.escape(notes)
-	loginname = client.escape(loginname)
+  unless lastname == nil
+    lastname = client.escape(lastname)
+    firstname = client.escape(firstname)
+    phone = client.escape(phone)
+    address1 = client.escape(address1)
+    address2 = client.escape(address2)
+    city = client.escape(city)
+    state = client.escape(state)
+    zip = client.escape(zip)
+	  loginname = client.escape(loginname)
+  end
 
-	client.query("INSERT INTO numbers (lastname, firstname, phone, address1, address2, city, state, zip, notes)
-  	VALUES('#{lastname}', '#{firstname}', '#{phone}', '#{address1}', '#{address2}', '#{city}', '#{state}', '#{zip}', '#{notes}', '#{loginname}')")
-  	results = client.query("SELECT * FROM entry WHERE 'lastname'='#{loginname}'")
+	client.query("INSERT INTO numbers (lastname, firstname, phone, address1, address2, city, state, zip)
+  	VALUES('#{lastname}', '#{firstname}', '#{phone}', '#{address1}', '#{address2}', '#{city}', '#{state}', '#{zip}')")
+  	results = client.query("SELECT * FROM numbers WHERE 'lastname'='#{lastname}'")
 	info = []
   	results.each do |row|
-    	info << [[row['lastname']], [row['firstname']], [row['phone']], [row['address1']], [row['address2']], [row['city']], [row['state']], [row['zip']], [row['notes']]]
+    	info << [[row['lastname']], [row['firstname']], [row['phone']], [row['address1']], [row['address2']], [row['city']], [row['state']], [row['zip']]]
  	end
-  	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
+  	erb :login_page, locals:{info: info, loginname: session[:loginname]}
 end
 
 
@@ -152,7 +151,7 @@ end
 
 #
 # post '/contacts_page_update' do
-# 	id_arr = params[:index_arr]
+# 	pk_arr = params[:pk_arr]
 # 	firstname_arr = params[:firstname_arr]
 #   lastname_arr = params[:lastname_arr]
 # 	phone_arr = params[:phone_arr]
@@ -196,7 +195,7 @@ end
 # 	results = client.query("SELECT * FROM entry WHERE 'ID'='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
-#     	info << [[row['Index']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
+#     	info << [[row['pk']], [row['Lastname']], [row['Firstname']], [row['Phone']], [row['Address1']], [row['Address2']], [row['City']], [row['State']], [row['ZIP']], [row['Notes']]]
 #  	end
 # 	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
 # end
@@ -215,8 +214,8 @@ end
 # 	loginname = session[:loginname]
 # 	loginname = client.escape(loginname)
 # 	counter = 0
-# 	unless index_arr == nil
-# 		index_arr.each do |ind|
+# 	unless pk_arr == nil
+# 		pk_arr.each do |ind|
 # 			ind = client.escape(ind)
 #
 #       client.query("UPDATE 'entry' SET 'Lastname'='#{lastname_arr[counter]}' WHERE 'ID='#{ind}'")
@@ -251,7 +250,7 @@ end
 # 	results = client.query("SELECT * FROM entry WHERE `Owner`='#{loginname}'")
 # 	info = []
 #   	results.each do |row|
-#     	info << [[row['Index']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
+#     	info << [[row['pk']], [row['Name']], [row['Phone']], [row['Address']], [row['Notes']], [row['Owner']], [row['Number']]]
 #  	end
 # 	erb :contacts_page, locals:{info: info, loginname: session[:loginname]}
 # end
