@@ -54,7 +54,8 @@ end
 
 post '/welcome_update' do
 	info = params[:info]
-	update_table(info_new, old_phone) ###troublesome
+	changes = update_table(info_new, old_phone) ###troublesome
+	p "LET'S GO ITERATE!"
   redirect "/welcomed_update"
 end
 

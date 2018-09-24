@@ -90,10 +90,10 @@ def update_table(info_new)
 db = PG::Connection.new(db_params)
 	counter = 0
 	info_new.each do |arr|
-		p "LET'S GO ITERATE!"
 		db.exec("UPDATE numbers SET lastname = '#{arr[0]}', firstname = '#{arr[1]}', phone = '#{arr[2]}', address1 = '#{arr[3]}', address2 = '#{arr[4]}', city = '#{arr[5]}', state = '#{arr[6]}', zip = '#{arr[7]}' WHERE phone = '#{old_phone[counter]}'")
 		counter =+ 1
 	end
+	info_new
 end
 
 
