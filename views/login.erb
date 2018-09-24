@@ -1,0 +1,46 @@
+<!-- <html>
+<head>
+
+
+<title>Login</title>
+<h1>Log in here!</h1>
+
+<form method="post" action="register1">
+<h3>First time users register</h3>
+<input type="submit" id="register" value="Register">
+</form>
+
+
+<br><br>
+<h3>Login</h3>
+<form method="post" action="login_page">
+<textarea rows="1" cols="20" placeholder="Username"></textarea>
+<textarea rows="1" cols="20" placeholder="Password"></textarea>
+<br><br>
+<input type="submit" id="login" value="Login">
+
+</form>
+
+
+</head>
+</html>
+ -->
+
+
+
+ <h1 id = "box2" class = "font_size cent font_type"> Enter Your Username and Password </h1>
+ <div id = "box2" class = "font_size cent font_type">
+ <%=message%><br>
+ </div>
+ <div id = "box">
+ <form method = "post" action = "login">
+ <input type = "text" name = "username" placeholder="username">
+ <input type = "password" name = "password" placeholder="password">
+ <input type = "submit" value = "enter">
+ </form>
+ <br><br>
+ <h1>New users please register</h1>
+ <form method = "post" action = "create_login">
+ <input type = "submit" value = "Create login">
+ </form>
+ </form></div>

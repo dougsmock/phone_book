@@ -1,5 +1,3 @@
-<html>
-<head>
 <title>Create new account</title>
 
 <style>
@@ -13,14 +11,7 @@
 				<form method="post" action="register">
 					<input type="text" name="loginname" placeholder="User Name" minlength="2" maxlength="25" pattern="[a-zA-Z0-9\s]+" title="Only one space; no special characters" required><br><br>
 					<input id="password1" type="password" name="password" placeholder="Password" minlength="8" maxlength="12" pattern="[a-zA-Z0-9]+" title="No special character or spaces" required><br><br>
-					<input id="password2" type="password" name="confirmpass" placeholder="Confirm" minlength="8" maxlength="12" pattern="[a-zA-Z0-9]+" title="No special characters or spaces" required><br><br>
 					<input class="button" type="submit" value="Create Account">
 				</form>
-			<div class="error"><p id="validate-status"></p></div>
-			<div class="error"><%=error2%></div>
 		</body>
 	</div>
-
-
-</head>
-</html>

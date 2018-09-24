@@ -1,0 +1,14 @@
+<h1 id = "box2" class = "font_size cent font_type"><%=answer%><br></h1>
+
+<%phone_book.each do |row|%>
+	<div id = "box" class = "font_size cent font_type"><%row.each do |item|%>
+	<%=item%>
+
+	<%end%></div>
+    <br>
+	<%end%>
+<div class = "cent"><form method = "post" action = "search">
+	<input type = "text" name = "lastname" placeholder="Last Name Search">
+	<input type = "text" name = "phone" placeholder="Phone # search">
+	<input type = "submit" value = "search">
+</form></div>

@@ -1,0 +1,20 @@
+<div id = "box" class = "font_size cent font_type"><form method = "post" action = "update">
+  <h1>Search and update page</h1>
+
+<%unless search_answer == "Need search term" || search_answer ==  "Not in phone book" %>
+    <%search_answer.each do |row|%>
+	<%yup = row.join(",")%>
+		<input type = "checkbox" name = "info[]" value = "<%=yup%>">
+		<%row.each do |item| %>
+			<%=item%>
+		<%end%>
+	<br>
+	<%end%>
+
+<%else%>
+<%=search_answer%>
+<%end%>
+<input type = "radio" name = "choose" value = "update" checked>update<br>
+<input type = "radio" name = "choose" value = "delete">delete<br>
+<input type = "submit" value = "enter">
+</form></div>
