@@ -58,7 +58,7 @@ def search_data_phone(info) ## search by phone number
 
 
 
-def search_data_lname(info) ## search by last name
+def search_data_lastname(info) ## search by last name
 	db_params = {
 		host: ENV['RDS_HOST'],
 		port: ENV['RDS_PORT'],
@@ -153,13 +153,13 @@ def add_to_login(userid,pword) ## add to logins as they register
 			password: ENV['RDS_PASSWORD']
 }
 db = PG::Connection.new(db_params)
- check = db.exec("SELECT*FROM login WHERE username = '#{userid}'")
+ check = db.exec ("SELECT * FROM login WHERE userid = '#{userid}'")
 	message = ""
 	if check.num_tuples.zero? == false
 		message = "Username Already Taken"
 	else
 		message = "Login Created"
-	db.exec("INSERT INTO login(username,password) VALUES ('#{userid}','#{pword}')")
+	db.exec("INSERT INTO login(userid,pword) VALUES ('#{userid}','#{pword}')")
 	end
 	message
 end

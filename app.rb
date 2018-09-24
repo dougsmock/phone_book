@@ -25,7 +25,7 @@ post '/register' do
 		userid = params[:userid]
 		pword = params[:pword]
 		message = add_to_login(userid,pword)
-	# 	redirect "/?message=" + message
+		# redirect "/?message=" + message #### reads on all, whether wrong or not.
 	redirect "/"
 end
 
@@ -53,9 +53,9 @@ end
 
 
 post '/welcome_update' do
+	p "Look at these #{params}"
 	info = params[:info]
-	changes = update_table(info_new, old_phone) ###troublesome
-	p "LET'S GO ITERATE!"
+	changes = update_table(info_new, old_phone)
   redirect "/welcomed_update"
 end
 
@@ -138,8 +138,18 @@ end
 #    redirect "/resultspage?answer=" + answer
 # end
 
-post '/searchandupdate' do
-  "Hello Search Update World"
+post "/searchandupdate" do
+	lastname = params[:lastname]
+	phone = params[:phone]
+
+	if phone == "" && lastname == ""
+		session[:search_answer] = "Need search term"
+	elsif phone == ""
+		session[:search_answer] = search_data_lastname(lastname)
+	else
+		session[:search_answer] = search_data_phone(phone)
+	end
+	redirect "/search_answer?"
 end
 
 post '/phone_form' do
@@ -188,19 +198,7 @@ end
 #
 #
 #
-# post "/search" do
-# 	lastname = params[:lastname]
-# 	phone = params[:phone]
-#
-# 	if phone == "" and lastname == ""
-# 		session[:search_answer] = "Need search term"
-# 	elsif phone == ""
-# 		session[:search_answer] = search_data_lastname(lastname)
-# 	else
-# 		session[:search_answer] = search_data_phone(phone)
-# 	end
-# 	redirect "/search_answer?"
-# end
+
 #
 # get "/search_answer" do
 #

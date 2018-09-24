@@ -1,20 +1,16 @@
   <h1>Update page</h1>
 
-
-
-
-
 <div class = "font_size cent font_type">
 <form method = "post" action = "updated">
-<%info.each do |row|%>
-<%=row%>
-<%split = row.split(',')%>
-<br>
-<%split.each do |item|%>
-<input type = "text" name = info[] value = "<%=item%>">
-<%end%>
-<br>
-<%end%>
+  <%info.each do |row|%>
+    <%=row%>
+    <%split = row.split(',')%>
+    <br>
+  <%split.each do |item|%>
+  <input type = "text" name = info[] value = "<%=item%>">
+  <%end%>
+  <br>
+  <%end%>
 
 
 <input type = "submit" value = "update">
