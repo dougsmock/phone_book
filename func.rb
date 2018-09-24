@@ -14,7 +14,7 @@ check = db.exec("SELECT * FROM numbers WHERE phone = '#{arr[-1]}'")
 		answer = "Number already in use."
 	else
 		answer = "You may join this phone book!"
-		db.exec("insert into numbers(lastname, firstname, phone, address1, address2, city, state, zip) VALUES('#{arr[0]}','#{arr[1]}','#{arr[2]}','#{arr[3]}','#{arr[4]}','#{arr[5]}','#{arr[6]}','#{arr[7]}')")
+		db.exec("INSERT INTO numbers(lastname, firstname, phone, address1, address2, city, state, zip) VALUES('#{arr[0]}','#{arr[1]}','#{arr[2]}','#{arr[3]}','#{arr[4]}','#{arr[5]}','#{arr[6]}','#{arr[7]}')")
 	end
 	answer
 end
@@ -67,7 +67,7 @@ def search_data_lname(info) ## search by last name
 		password: ENV['RDS_PASSWORD']
 }
 db = PG::Connection.new(db_params)
-check = db.exec("SELECT * FROM numbers WHERE last_name = '#{info}'")
+check = db.exec("SELECT * FROM numbers WHERE lastname = '#{info}'")
 yup = check.num_tuples
 if check.num_tuples.zero? == false
 	search_answer = check.values

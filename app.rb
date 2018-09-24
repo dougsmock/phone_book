@@ -25,11 +25,6 @@ post '/register' do
   redirect "/"
 end
 
-
-
-
-
-
 post "/made_login" do ## on register page
 	userid = params[:userid]
 	pword = params[:pword]
@@ -49,14 +44,13 @@ post "/login" do
 	end
 end
 
+
+
+
+
 get "/info" do
     erb :phone_form
 end
-
-
-
-
-
 
 post "/results" do
 	info = params[:info]
@@ -69,6 +63,10 @@ get '/resultspage' do
 	phone_book = database_info()
 	erb :results, locals:{answer:answer,phone_book:phone_book}
 end
+
+
+
+
 
 post "/search" do
 	lastname = params[:lastname]
