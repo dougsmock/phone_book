@@ -1,0 +1,64 @@
+.welcome {
+    background-color: gold;
+    padding: 5px 13px 5px 13px;
+    text-align: center;
+    border: 10px solid;
+    border-width: 10px 10px 10px 10px;
+    border-radius: 60px;
+    border-color: black;
+    font-size: 36px;
+    margin: 8px 0px 0px 0px;
+    max-width: 400px;
+    margin: auto;
+  }
+
+  h4 {
+    font-family: Avenir, Helvetica, sans-serif;
+    font-size: 30px;
+    font-weight: lighter;
+    font-color: #737373;
+    margin-bottom: 50px;
+    line-height: 0px;
+
+  }
+
+  h5 {
+    font-family: Avenir, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: lighter;
+    font-color: #737373;
+    margin-bottom: 20px;
+    line-height: 0px;
+
+  }
+
+  .button1 {
+    background-color: gray;
+  	border: none;
+    font-family: Verdana, Helvetica, sans-serif;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 18px;
+    font-color: black;
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+  }
+
+  .button2 {
+    background-color: gray;
+  	border: none;
+    font-family: Verdana, Helvetica, sans-serif;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 18px;
+    font-color: black;
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+  }
+
+  .formline {
+    line-height: 0px;
+
+  }

@@ -158,8 +158,8 @@ db = PG::Connection.new(db_params)
 	if check.num_tuples.zero? == false
 		message = "Username Already Taken"
 	else
+		db.exec("INSERT INTO login (userid, pword) VALUES ('#{userid}','#{pword}')")   
 		message = "Login Created"
-	db.exec("INSERT INTO login(userid,pword) VALUES ('#{userid}','#{pword}')")
 	end
 	message
 end

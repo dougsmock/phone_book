@@ -1,27 +1,32 @@
 <html>
 <head>
   <title>Enter contact info</title>
+    <link rel="stylesheet" type="text/css" href="/css/layout.css">
 </head>
 
-  <style>
 
 
-  </style>
+<div class="welcome">
+<div class="formline">
 
 <form method="post" action="phone_form">
 
-<h1>Fill in contact info</h1>
-<h4>First Name <input type="text" name = "info[]" maxlength="20" pattern="[a-zA-Z0-9\s]+" required></h4>
-<h4>Last Name <input type="text" name = "info[]" maxlength="20" pattern="[a-zA-Z0-9\s]+" required></h4>
-<h4>Phone number <input type="text" name = "info[]" maxlength="20" pattern="[a-zA-Z0-9\s]+" required></h4>
-<h4>Address 1 <input type="text" name = "info[]" maxlength="20" pattern="[a-zA-Z0-9\s]+"></h4>
-<h4>Address 2 <input type="text" name = "info[]" maxlength="20" pattern="[a-zA-Z0-9\s]+"></h4>
-<h4>City <input type="text" name = "info[]" maxlength="15" pattern="[a-zA-Z0-9\s]+"></h4>
-<h4>State <input type="text" name = "info[]" maxlength="2" pattern="[a-zA-Z0-9\s]+"></h4>
-<h4>ZIP <input type="text" name = "info[]" maxlength="10" pattern="[a-zA-Z0-9\s]+"><br></h4>
-<input type = "submit" value = "Enter">
-</form>
+<h2>Contact info</h2>
+<h5>First Name <input type="text" name="info[]" style="width:250px; height:27px" maxlength="30" pattern="[a-zA-Z0-9\s]+" required><br>
+<h5>Last Name <input type="text" name="info[]" style="width:250px; height:27px" maxlength="30" pattern="[a-zA-Z0-9\s]+" required><br>
+<h5>Phone <input type="text" name="info[]" style="width:150px; height:27px" maxlength="20" required><br>
+<h5>Address 1 <input type="text" name="info[]" style="width:250px; height:27px" maxlength="30" pattern="[a-zA-Z0-9\s]+"><br>
+<h5>Address 2 <input type="text" name="info[]" style="width:250px; height:27px" maxlength="30" pattern="[a-zA-Z0-9\s]+"><br>
+<h5>City <input type="text" name="info[]" style="width:250px; height:27px" maxlength="25" pattern="[a-zA-Z0-9\s]+"><br>
+<h5>State <input type="text" name="info[]" style="width:40px; height:27px" maxlength="2" pattern="[A-Z\s]+">   ZIP <input type="text" name="info[]" style="width:80px; height:27px" maxlength="10" pattern="[a-zA-Z0-9\s]+"><br></h5>
 
+<input class="button2" type="submit" value = "Enter">
+</form>
+</div>
+</div>
+
+
+</html>
 
 <!--
 

@@ -26,19 +26,26 @@
 </html>
  -->
 
+ <html>
+ <head>
+   <title>Enter contact info</title>
+     <link rel="stylesheet" type="text/css" href="/css/layout.css">
+ </head>
 
 
- <h1 id = "box2" class = "font_size cent font_type"> Enter Your Username and Password </h1>
- <div id = "box2" class = "font_size cent font_type">
- <%=message%><br>
- </div>
- <div id = "box">
+
+
+ <div class="welcome">
+ <h1>Log in</h1>
+ <%=message%><br><br>
+
  <form method = "post" action = "login">
  <input type = "text" name = "username" placeholder="username">
  <input type = "password" name = "password" placeholder="password">
  <input type = "submit" value = "enter">
  </form>
-<br><br>
+
+
 
 
 <!--
@@ -50,9 +57,8 @@
  </div> -->
 
 
- <br><br>
- <h1>New users please register</h1>
+ <h1>New users</h1>
  <form method = "post" action = "create_login">
  <input type = "submit" value = "Create login">
  </form>
- </form></div>
+ </div>

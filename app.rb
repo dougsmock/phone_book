@@ -21,13 +21,27 @@ get "/make_login" do
 	erb :register
 end
 
+
 post '/register' do
 		userid = params[:userid]
 		pword = params[:pword]
 		message = add_to_login(userid,pword)
-		# redirect "/?message=" + message #### reads on all, whether wrong or not.
-	redirect "/"
+		# if message == "Username or Password Taken"
+		# 	redirect "/?message=" + message
+		# elsif
+		# 	message == "Login Created"
+			redirect "/"
+		# end
 end
+
+
+
+
+
+
+
+
+
 
 get "/" do ## new command; sends successful login to a welcome page.
 message = params[:message]
@@ -51,10 +65,11 @@ end
 
 
 
-
+#### I am held up here.
 post '/welcome_update' do
 	p "Look at these #{params}"
-	info = params[:info]
+	info_new = params[:info_new]
+	changes = params[:changes]
 	changes = update_table(info_new, old_phone)
   redirect "/welcomed_update"
 end
@@ -104,7 +119,7 @@ get "/welcomed_delete" do
 end
 
 post '/phone_form' do
-  "Hello Phone Form World"
+  "You have a new record, maybe."
 end
 
 post '/update' do
