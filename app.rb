@@ -59,16 +59,47 @@ get '/logged_in' do
 	erb :welcome
 end
 
+
+#######################
+
+
+
 post '/welcome_new' do
-  redirect "/welcomed_new"
+	puts "Do we have #{params}?"
+	firstname = params[:firstname]
+	lastname = params[:lastname]
+	phone = params[:phone]
+	address1 = params[:address1]
+	address2 = params[:address2]
+	city = params[:city]
+	state = params[:state]
+	zip = params[:zip]
+
+	add_numbers()
+  redirect "/mighthaverecord"
 end
 
+get '/mighthaverecord' do
+	erb :mighthaverecord
+end
+
+post '/mighthaverecord' do
+	redirect '/'
+end
+
+#################
 
 
-#### I am held up here.
+
+
+
+
+
 post '/welcome_update' do
 	p "Look at these #{params}"
 	info_new = params[:info_new]
+	old_phone = params[:old_phone]
+
 	changes = params[:changes]
 	changes = update_table(info_new, old_phone)
   redirect "/welcomed_update"
@@ -94,9 +125,7 @@ get "/welcomed_new" do
 	erb :phone_form
 end
 
-# get "/info" do ### similar to item above
-#     erb :phone_form
-# end
+
 
 get "/welcomed_update" do
 	erb :update, locals:{info:session[:info]}
@@ -158,7 +187,7 @@ post "/searchandupdate" do
 	phone = params[:phone]
 
 	if phone == "" && lastname == ""
-		session[:search_answer] = "Need search term"
+		session[:search_answer] = "Need search term."
 	elsif phone == ""
 		session[:search_answer] = search_data_lastname(lastname)
 	else

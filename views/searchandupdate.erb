@@ -1,7 +1,8 @@
-<div id = "box" class = "font_size cent font_type"><form method = "post" action = "update">
+<div id = "box" class = "font_size cent font_type">
+<form method = "post" action = "update">
   <h1>Search and update page</h1>
 
-<%unless search_answer == "Need search term" || search_answer ==  "Not in phone book" %>
+<%unless search_answer == "Need search term." || search_answer ==  "Not in phone book." %>
     <%search_answer.each do |row|%>
 	<%yup = row.join(",")%>
 		<input type = "checkbox" name = "info[]" value = "<%=yup%>">

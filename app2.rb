@@ -1,21 +1,25 @@
-require 'sinatra'
-require 'pg'
-# require 'bcrypt'
-# require 'securerandom'
-load './local_ENV.rb' if File.exists?('./local_ENV.rb')
-enable :sessions
-#
-#
-#
-# #############################
+###### THIS PAGE IS NOT BEING USED AT THIS TIME.
 
-conn = PG::Connection.open(:host => ENV['RDS_HOST'], :dbname => ENV['RDS_DB_NAME'], :user => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :port => ENV['RDS_PORT'])
-
-def prepare_statements(conn)
-	# conn.prepare("newuser4", "insert into login (uuid, userid, pword) values ($1, $2, $3)")
-	conn.prepare("cons", "insert into numbers (lastname, firstname, phone, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7, $8)")
-end
-prepare_statements(conn)
+#
+#
+# require 'sinatra'
+# require 'pg'
+# # require 'bcrypt'
+# # require 'securerandom'
+# load './local_ENV.rb' if File.exists?('./local_ENV.rb')
+# enable :sessions
+# #
+# #
+# #
+# # #############################
+#
+# conn = PG::Connection.open(:host => ENV['RDS_HOST'], :dbname => ENV['RDS_DB_NAME'], :user => ENV['RDS_USERNAME'], :password => ENV['RDS_PASSWORD'], :port => ENV['RDS_PORT'])
+#
+# def prepare_statements(conn)
+# 	# conn.prepare("newuser4", "insert into login (uuid, userid, pword) values ($1, $2, $3)")
+# 	conn.prepare("cons", "insert into numbers (lastname, firstname, phone, address1, address2, city, state, zip) values($1, $2, $3, $4, $5, $6, $7, $8)")
+# end
+# prepare_statements(conn)
 
 #
 # ###############################

@@ -1,4 +1,4 @@
-def add_numbers(arr) ## add phone number records
+def add_numbers()
 db_params = {
 	host: ENV['RDS_HOST'],
 	port: ENV['RDS_PORT'],
@@ -8,6 +8,7 @@ db_params = {
 }
 db = PG::Connection.new(db_params)
 answer = ""
+arr = []
 check = db.exec("SELECT * FROM numbers WHERE phone = '#{arr[-1]}'")
 
 	if check.num_tuples.zero? == false
@@ -79,7 +80,7 @@ end
 
 
 
-def update_table(info_new)
+def update_table(info_new, old_phone)
 		db_params = {
 			host: ENV['RDS_HOST'],
 			port: ENV['RDS_PORT'],
@@ -93,7 +94,6 @@ db = PG::Connection.new(db_params)
 		db.exec("UPDATE numbers SET lastname = '#{arr[0]}', firstname = '#{arr[1]}', phone = '#{arr[2]}', address1 = '#{arr[3]}', address2 = '#{arr[4]}', city = '#{arr[5]}', state = '#{arr[6]}', zip = '#{arr[7]}' WHERE phone = '#{old_phone[counter]}'")
 		counter =+ 1
 	end
-	info_new
 end
 
 
@@ -158,7 +158,7 @@ db = PG::Connection.new(db_params)
 	if check.num_tuples.zero? == false
 		message = "Username Already Taken"
 	else
-		db.exec("INSERT INTO login (userid, pword) VALUES ('#{userid}','#{pword}')")   
+		db.exec("INSERT INTO login (userid, pword) VALUES ('#{userid}','#{pword}')")
 		message = "Login Created"
 	end
 	message
