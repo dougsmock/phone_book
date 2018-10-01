@@ -14,6 +14,7 @@ message = params[:message]
 end
 
 post "/create_login" do
+	# add create function
 	redirect "/make_login"
 end
 
@@ -21,24 +22,23 @@ get "/make_login" do
 	erb :register
 end
 
-
 post '/register' do
 		userid = params[:userid]
 		pword = params[:pword]
 		message = add_to_login(userid,pword)
-		# if message == "Username or Password Taken"
-		# 	redirect "/?message=" + message
-		# elsif
-		# 	message == "Login Created"
+		if message == "Username or Password Taken"
+			redirect "/?message=" + message
+		elsif
+			message == "Login Created"
 			redirect "/"
-		# end
+		end
 end
 
 
 
+#login form
 
-
-get "/" do ## new command; sends successful login to a welcome page.
+get "/" do
 message = params[:message]
 	if message == nil
 		message = "Please Enter Username and Password"
@@ -75,38 +75,37 @@ get '/phone_form' do
 end
 
 post '/filling_form' do
-	redirect '/mighthaverecord'
+	redirect '/back_to_welcome'
+end
+
+get '/back_to_welcome' do
+	erb :welcome
 end
 
 
-get '/mighthaverecord' do
-	erb :mighthaverecord
+post '/welcome_new' do
+	puts "Do we have #{params}?"
+	firstname = params[:firstname]
+	lastname = params[:lastname]
+	phone = params[:phone]
+	address1 = params[:address1]
+	address2 = params[:address2]
+	city = params[:city]
+	state = params[:state]
+	zip = params[:zip]
+
+	add_numbers()
+  redirect "/phone_form"
 end
-
-
-
-
-
-
-
-
-
-
 
 post '/welcome_update' do
 	p "Look at these #{params}"
 	info_new = params[:info_new]
 	old_phone = params[:old_phone]
-
 	changes = params[:changes]
 	changes = update_table(info_new, old_phone)
   redirect "/welcomed_update"
 end
-
-
-
-
-
 
 post '/welcome_search' do
   redirect "/welcomed_search"
