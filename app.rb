@@ -38,11 +38,6 @@ end
 
 
 
-
-
-
-
-
 get "/" do ## new command; sends successful login to a welcome page.
 message = params[:message]
 	if message == nil
@@ -60,10 +55,6 @@ get '/logged_in' do
 end
 
 
-#######################
-
-
-
 post '/welcome_new' do
 	puts "Do we have #{params}?"
 	firstname = params[:firstname]
@@ -76,18 +67,25 @@ post '/welcome_new' do
 	zip = params[:zip]
 
 	add_numbers()
-  redirect "/mighthaverecord"
+  redirect "/phone_form"
 end
+
+get '/phone_form' do
+	erb :phone_form
+end
+
+post '/filling_form' do
+	redirect '/mighthaverecord'
+end
+
 
 get '/mighthaverecord' do
 	erb :mighthaverecord
 end
 
-post '/mighthaverecord' do
-	redirect '/'
-end
 
-#################
+
+
 
 
 
