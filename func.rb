@@ -38,7 +38,7 @@ db.exec("SELECT * FROM numbers" ) do |result|
    data
 end
 
-def search_data_phone(info) ## search by phone number
+def search_data_phone(info)
 	db_params = {
 		host: ENV['RDS_HOST'],
 		port: ENV['RDS_PORT'],
@@ -47,6 +47,7 @@ def search_data_phone(info) ## search by phone number
 		password: ENV['RDS_PASSWORD']
 }
 	db = PG::Connection.new(db_params)
+	info = ""
 	check = db.exec("SELECT * FROM numbers WHERE phone = '#{info}'")
 
 	if check.num_tuples.zero? == false
@@ -90,9 +91,9 @@ def update_table(info_new, old_phone)
 }
 db = PG::Connection.new(db_params)
 	counter = 0
-	info_new.each do |arr|
+	old_phone.each do |arr|
 		db.exec("UPDATE numbers SET lastname = '#{arr[0]}', firstname = '#{arr[1]}', phone = '#{arr[2]}', address1 = '#{arr[3]}', address2 = '#{arr[4]}', city = '#{arr[5]}', state = '#{arr[6]}', zip = '#{arr[7]}' WHERE phone = '#{old_phone[counter]}'")
-		counter =+ 1
+		counter += 1
 	end
 end
 

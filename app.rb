@@ -23,13 +23,18 @@ get "/make_login" do
 end
 
 post '/register' do
+	p "Hello World"
 		userid = params[:userid]
 		pword = params[:pword]
+	p "She has a lot of #{params}."
 		message = add_to_login(userid,pword)
+		# how do you compare?
 		if message == "Username or Password Taken"
+			p "Taken."
 			redirect "/?message=" + message
 		elsif
 			message == "Login Created"
+			p "Not taken."
 			redirect "/"
 		end
 end
@@ -39,15 +44,17 @@ end
 #login form
 
 get "/" do
-message = params[:message]
+	message = params[:message]
 	if message == nil
 		message = "Please Enter Username and Password"
 	end
 		erb :login, locals:{message:message}
 end
 
-post '/login' do
-  redirect '/logged_in'
+post '/login' do ##couldn't check creds here
+	p "Hello Canadians"
+
+	redirect '/logged_in'
 end
 
 get '/logged_in' do
@@ -56,6 +63,8 @@ end
 
 
 post '/welcome_new' do
+	p "Hello Fresh People"
+
 	puts "Do we have #{params}?"
 	firstname = params[:firstname]
 	lastname = params[:lastname]
@@ -75,6 +84,7 @@ get '/phone_form' do
 end
 
 post '/filling_form' do
+	p "Yo."
 	redirect '/back_to_welcome'
 end
 
@@ -84,6 +94,8 @@ end
 
 
 post '/welcome_new' do
+	p "Yo you too."
+
 	puts "Do we have #{params}?"
 	firstname = params[:firstname]
 	lastname = params[:lastname]
@@ -99,6 +111,8 @@ post '/welcome_new' do
 end
 
 post '/welcome_update' do
+	p "Yeah, right."
+
 	p "Look at these #{params}"
 	info_new = params[:info_new]
 	old_phone = params[:old_phone]
@@ -108,10 +122,14 @@ post '/welcome_update' do
 end
 
 post '/welcome_search' do
+	p "Hello Dingbats"
+
   redirect "/welcomed_search"
 end
 
 post '/welcome_delete' do
+	p "Hello Santa Claus."
+
   redirect "/welcomed_delete"
 end
 
@@ -145,11 +163,13 @@ get "/welcomed_delete" do
 end
 
 post '/phone_form' do
+	p "Hello Julius"
+
   "You have a new record, maybe."
 end
 
 post '/update' do
-  "Hello Update World"
+  p "Hello Update World"
 	answer = "Info Updated"
 	  updated_info = params[:info]
 		updated_slice = updated_info.each_slice(7).to_a
@@ -180,6 +200,7 @@ end
 # end
 
 post "/searchandupdate" do
+	"Hello somebody."
 	lastname = params[:lastname]
 	phone = params[:phone]
 
@@ -194,7 +215,7 @@ post "/searchandupdate" do
 end
 
 post '/phone_form' do
-  "Hello Deleted World"
+  p "Hello Deleted World"
 end
 
 
