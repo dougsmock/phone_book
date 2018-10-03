@@ -19,29 +19,28 @@ post "/create_login" do
 end
 
 get "/make_login" do
-	erb :register
+	erb :make_login
 end
 
-post '/register' do
+post '/make_login' do
 	p "Hello World"
 		userid = params[:userid]
 		pword = params[:pword]
-	p "She has a lot of #{params}."
+	p "Here, have a side order of #{params}."
 		message = add_to_login(userid,pword)
-		# how do you compare?
-		if message == "Username or Password Taken"
-			p "Taken."
-			redirect "/?message=" + message
-		elsif
-			message == "Login Created"
-			p "Not taken."
+		# if message == "Username or Password Taken"
+		# 	redirect "/?message=" + message
+		# elsif
+		# 	message == "Login Created"
 			redirect "/"
-		end
+		# end
 end
 
+get '/register2' do
+	"Hello World Again!"
+	erb :login
+end
 
-
-#login form
 
 get "/" do
 	message = params[:message]

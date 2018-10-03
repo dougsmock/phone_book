@@ -6,7 +6,7 @@ db_params = {
 	user: ENV['RDS_USERNAME'],
 	password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 answer = ""
 arr = []
 check = db.exec("SELECT * FROM numbers WHERE phone = '#{arr[-1]}'")
@@ -29,7 +29,7 @@ def database_info()  ## select from numbers
 		password: ENV['RDS_PASSWORD']
 }
 data = []
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 db.exec("SELECT * FROM numbers" ) do |result|
       result.each do |row|
       	data << row.values
@@ -46,8 +46,7 @@ def search_data_phone(info)
 		user: ENV['RDS_USERNAME'],
 		password: ENV['RDS_PASSWORD']
 }
-	db = PG::Connection.new(db_params)
-	info = ""
+	db = Mysql2::Connection.new(db_params)
 	check = db.exec("SELECT * FROM numbers WHERE phone = '#{info}'")
 
 	if check.num_tuples.zero? == false
@@ -68,7 +67,7 @@ def search_data_lastname(info) ## search by last name
 		user: ENV['RDS_USERNAME'],
 		password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 check = db.exec("SELECT * FROM numbers WHERE lastname = '#{info}'")
 yup = check.num_tuples
 if check.num_tuples.zero? == false
@@ -89,7 +88,7 @@ def update_table(info_new, old_phone)
 			user: ENV['RDS_USERNAME'],
 			password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 	counter = 0
 	old_phone.each do |arr|
 		db.exec("UPDATE numbers SET lastname = '#{arr[0]}', firstname = '#{arr[1]}', phone = '#{arr[2]}', address1 = '#{arr[3]}', address2 = '#{arr[4]}', city = '#{arr[5]}', state = '#{arr[6]}', zip = '#{arr[7]}' WHERE phone = '#{old_phone[counter]}'")
@@ -107,7 +106,7 @@ def delete_from_table(delete_info) ## delete an entry
 		user: ENV['RDS_USERNAME'],
 		password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 	arr = []
 	delete_info.each do |row|
 		yup = row.split(',')
@@ -129,7 +128,7 @@ def check_creds?(userid,pword) ## check credentials
 		user: ENV['RDS_USERNAME'],
 		password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
+db = Mysql2::Connection.new(db_params)
 
 check = db.exec("SELECT*FROM login WHERE userid = '#{userid}'")
  		if check.num_tuples.zero? == false
@@ -153,9 +152,8 @@ def add_to_login(userid,pword) ## add to logins as they register
 			user: ENV['RDS_USERNAME'],
 			password: ENV['RDS_PASSWORD']
 }
-db = PG::Connection.new(db_params)
- check = db.exec ("SELECT * FROM login WHERE userid = '#{userid}'")
-	message = ""
+db = Mysql2::Connection.new(db_params)
+ check = db.exec("SELECT * FROM login WHERE userid = '#{userid}'")
 	if check.num_tuples.zero? == false
 		message = "Username Already Taken"
 	else
